@@ -1,0 +1,10 @@
+<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Network Security Monitor</title>
+<style>body{font-family:Arial;background:#0f172a;color:white;max-width:1000px;margin:auto;padding:25px}input,textarea,button{width:100%;box-sizing:border-box;padding:12px;margin:7px 0;background:#1e293b;color:white;border:1px solid #475569;border-radius:8px}button{background:#2563eb}table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #334155}.High{color:#f87171}.Medium{color:#fbbf24}.Low{color:#4ade80}</style>
+<h1>Network Security Monitoring Dashboard</h1><p>Defensive local event analyzer.</p>
+<input id="ip" placeholder="Source IP" value="192.168.1.10"><textarea id="msg" placeholder="Example: Multiple failed login attempts detected"></textarea><button onclick="add()">Analyze & Save</button><button onclick="clearAll()">Clear</button>
+<table><thead><tr><th>Time</th><th>IP</th><th>Message</th><th>Severity</th></tr></thead><tbody id="rows"></tbody></table>
+<script>
+async function load(){let a=await fetch("/api/events").then(r=>r.json());rows.innerHTML=a.map(x=>`<tr><td>${x.timestamp}</td><td>${x.ip}</td><td>${x.message}</td><td class="${x.severity}">${x.severity}</td></tr>`).join("")}
+async function add(){if(!msg.value)return alert("Enter a message");await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ip:ip.value,message:msg.value})});msg.value="";load()}
+async function clearAll(){await fetch("/api/clear",{method:"POST"});load()} load()
+</script>
